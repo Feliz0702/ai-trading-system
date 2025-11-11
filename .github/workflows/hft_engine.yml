@@ -1,0 +1,38 @@
+name: HFT Engine Build & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ pkg-config libnuma-dev
+      - name: Configure
+        run: cmake -S hft_engine -B hft_engine/build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build hft_engine/build -j
+      - name: Test
+        run: ctest --test-dir hft_engine/build --output-on-failure
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Install CMake
+        uses: lukka/get-cmake@v3
+      - name: Configure
+        run: cmake -S hft_engine -B hft_engine/build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build hft_engine/build --config Release -j
+      - name: Test
+        run: ctest --test-dir hft_engine/build -C Release --output-on-failure
