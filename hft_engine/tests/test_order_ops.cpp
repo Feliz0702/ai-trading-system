@@ -11,7 +11,7 @@ int main(){
     // add one order
     Order o{}; o.order_id=123; o.symbol="BTC/USDT"; o.side=Side::BUY; o.type=OrderType::LIMIT; o.price=50000.0; o.quantity=1.0;
     auto res = book.add_order(std::move(o));
-    assert(res.accepted || res.success); // support both MatchingResult shapes
+    assert(res.accepted);
     pump_cycles(book, 2);
 
     // modify
