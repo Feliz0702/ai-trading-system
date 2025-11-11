@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 
-TradingEngine::TradingEngine(){ hardware_optimizer_.set_numa_affinity(0); }
+TradingEngine::TradingEngine(){ /* no-op */ }
 TradingEngine::~TradingEngine(){ stop(); }
 
 bool TradingEngine::initialize(const EngineConfig& config){
@@ -47,11 +47,11 @@ OrderBookSnapshot TradingEngine::get_order_book(const std::string& symbol){
 void TradingEngine::matching_worker(int thread_id){
     hardware_optimizer_.set_cpu_affinity(thread_id);
     using namespace std::chrono;
-    auto last = steady_clock::now();
+    auto last_ts = steady_clock::now();
     while(running_.load(std::memory_order_acquire)){
         for(auto& kv : order_books_){ kv.second->matching_cycle(); }
         if(config_.matching_interval_us>0){ std::this_thread::sleep_for(microseconds(config_.matching_interval_us)); }
-        auto now = steady_clock::now(); if(duration_cast<seconds>(now-last).count()>=1){ last=now; }
+        auto now = steady_clock::now(); if(duration_cast<seconds>(now-last_ts).count()>=1){ last_ts=now; }
     }
 }
 
