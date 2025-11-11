@@ -12,6 +12,9 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -mtune=native")
 endif()
 
+# Threads
+find_package(Threads REQUIRED)
+
 # Optional NUMA on Linux
 if(UNIX AND NOT APPLE)
   find_package(PkgConfig QUIET)
@@ -24,6 +27,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 file(GLOB_RECURSE SRC "src/*.cpp")
 add_library(hft_engine STATIC ${SRC})
+target_link_libraries(hft_engine PRIVATE Threads::Threads)
 
 if(NUMA_FOUND)
   target_include_directories(hft_engine PRIVATE ${NUMA_INCLUDE_DIRS})

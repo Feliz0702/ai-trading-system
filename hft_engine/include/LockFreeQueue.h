@@ -3,12 +3,13 @@
 #include <vector>
 #include <cstddef>
 #include <memory>
+#include <thread>
 
 #if defined(__x86_64__) || defined(_M_X64)
   #include <immintrin.h>
   inline void lf_pause() { _mm_pause(); }
 #else
-  inline void lf_pause() { /* no-op */ }
+  inline void lf_pause() { std::this_thread::yield(); }
 #endif
 
 // 環形無鎖隊列（單生產者/單消費者用例，簡化）
