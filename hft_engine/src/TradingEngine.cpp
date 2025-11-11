@@ -14,7 +14,7 @@ bool TradingEngine::initialize(const EngineConfig& config){
 
 void TradingEngine::start(){
     running_.store(true, std::memory_order_release);
-    int mt = std::max(1, config_.matching_threads);
+    int mt = (std::max)(1, config_.matching_threads);
     for(int i=0;i<mt;++i){ worker_threads_.emplace_back(&TradingEngine::matching_worker, this, i); }
     // 簡化：network/persistence 可選
 }

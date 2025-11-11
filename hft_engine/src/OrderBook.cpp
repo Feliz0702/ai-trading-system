@@ -63,8 +63,10 @@ void OrderBook::process_order_batch(Order** orders, int count){
 void OrderBook::add_order_to_book(Order* order){
     order_index_[order->order_id] = order;
     auto& book = (order->side==Side::BUY) ? bids_ : asks_;
-    // 將數量累加到最接近的價位（簡化：直接取索引）
-    int idx = std::min<int>(MAX_DEPTH_LEVELS-1, std::max(0, static_cast<int>(order->price) % MAX_DEPTH_LEVELS));
+    // 將數量累加到最接近的價位（簡化：直接取索引），避免宏干擾使用括號調用
+    int price_index = static_cast<int>(order->price) % MAX_DEPTH_LEVELS;
+    if(price_index < 0) price_index += MAX_DEPTH_LEVELS;
+    int idx = (std::min)(MAX_DEPTH_LEVELS - 1, (std::max)(0, price_index));
     book[idx].price = order->price;
     book[idx].quantity += order->quantity;
     sequence_.fetch_add(1, std::memory_order_relaxed);
